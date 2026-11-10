@@ -1,0 +1,2 @@
+using UnrealBuildTool;
+public class RoughHouseClip1 : ModuleRules { public RoughHouseClip1(ReadOnlyTargetRules Target) : base(Target) { PCHUsage=PCHUsageMode.UseExplicitOrSharedPCHs; PublicDependencyModuleNames.AddRange(new string[]{"Core","CoreUObject","Engine","InputCore"}); } }

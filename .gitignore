@@ -1,0 +1,17 @@
+# Unreal Engine generated files
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+*.sln
+*.slnx
+*.vcxproj
+*.vcxproj.filters
+*.VC.db
+*.opendb
+UpgradeLog.htm
+
+# Local backups and nested clones
+Backup/
+RoughHouse_Clip1/

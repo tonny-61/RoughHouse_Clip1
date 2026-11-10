@@ -1,0 +1,13 @@
+{
+  "FileVersion": 3,
+  "EngineAssociation": "5.8",
+  "Category": "Games",
+  "Description": "RoughHouse Clip 1 \u2014 UE 5.8 C++ combat blocking prototype",
+  "Modules": [
+    {
+      "Name": "RoughHouseClip1",
+      "Type": "Runtime",
+      "LoadingPhase": "Default"
+    }
+  ]
+}
