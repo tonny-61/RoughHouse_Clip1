@@ -7,6 +7,7 @@
 class UAnimSequence;
 class USkeletalMesh;
 class USkeletalMeshComponent;
+class UStaticMeshComponent;
 class UTextRenderComponent;
 
 UCLASS()
@@ -41,6 +42,12 @@ public:
 private:
     UPROPERTY(VisibleAnywhere) TObjectPtr<USceneComponent> SceneRoot;
     UPROPERTY(VisibleAnywhere) TObjectPtr<UTextRenderComponent> NameLabel;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> BodyBlock;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> HeadBlock;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> LeftArmBlock;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> RightArmBlock;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> LeftLegBlock;
+    UPROPERTY(VisibleAnywhere) TObjectPtr<UStaticMeshComponent> RightLegBlock;
     UPROPERTY() TObjectPtr<ARHFighter> Opponent;
     UPROPERTY() TObjectPtr<USkeletalMesh> MannyMesh;
     UPROPERTY() TObjectPtr<USkeletalMesh> QuinnMesh;
@@ -59,4 +66,5 @@ private:
     int32 PunchCount = 0;
 
     void PlayLocomotion();
+    void ResetBlockingPose();
 };

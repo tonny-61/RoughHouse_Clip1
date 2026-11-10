@@ -4,7 +4,9 @@
 #include "Animation/AnimSequence.h"
 #include "Components/SceneComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "Components/TextRenderComponent.h"
+#include "Engine/StaticMesh.h"
 #include "Engine/SkeletalMesh.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -24,6 +26,27 @@ ARHFighter::ARHFighter()
     NameLabel->SetRelativeLocation(FVector(0.0f, 0.0f, 220.0f));
     NameLabel->SetHorizontalAlignment(EHorizTextAligment::EHTA_Center);
     NameLabel->SetWorldSize(28.0f);
+
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeAsset(TEXT("/Engine/BasicShapes/Cube.Cube"));
+    auto CreateBlock = [this](const TCHAR* Name, const FVector& Location, const FVector& Scale)
+    {
+        UStaticMeshComponent* Block = CreateDefaultSubobject<UStaticMeshComponent>(Name);
+        Block->SetupAttachment(SceneRoot);
+        Block->SetRelativeLocation(Location);
+        Block->SetRelativeScale3D(Scale);
+        Block->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+        if (CubeAsset.Succeeded())
+        {
+            Block->SetStaticMesh(CubeAsset.Object);
+        }
+        return Block;
+    };
+    BodyBlock = CreateBlock(TEXT("BodyBlock"), FVector(0.0f, 0.0f, 104.0f), FVector(0.42f, 0.28f, 0.58f));
+    HeadBlock = CreateBlock(TEXT("HeadBlock"), FVector(0.0f, 0.0f, 184.0f), FVector(0.25f, 0.25f, 0.25f));
+    LeftArmBlock = CreateBlock(TEXT("LeftArmBlock"), FVector(8.0f, -40.0f, 125.0f), FVector(0.16f, 0.16f, 0.45f));
+    RightArmBlock = CreateBlock(TEXT("RightArmBlock"), FVector(8.0f, 40.0f, 125.0f), FVector(0.16f, 0.16f, 0.45f));
+    LeftLegBlock = CreateBlock(TEXT("LeftLegBlock"), FVector(0.0f, -17.0f, 42.0f), FVector(0.17f, 0.17f, 0.42f));
+    RightLegBlock = CreateBlock(TEXT("RightLegBlock"), FVector(0.0f, 17.0f, 42.0f), FVector(0.17f, 0.17f, 0.42f));
 
     static ConstructorHelpers::FObjectFinder<USkeletalMesh> MannyAsset(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple.SKM_Manny_Simple"));
     static ConstructorHelpers::FObjectFinder<USkeletalMesh> QuinnAsset(TEXT("/Game/Characters/Mannequins/Meshes/SKM_Quinn_Simple.SKM_Quinn_Simple"));
@@ -55,6 +78,15 @@ void ARHFighter::ConfigureFighter(FName InName, bool bUseManny)
     NameLabel->SetTextRenderColor(bUseManny ? FColor(255, 120, 45) : FColor(65, 170, 255));
     CharacterMesh->SetSkeletalMesh(bUseManny ? MannyMesh : QuinnMesh);
     CharacterMesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+    // Keep a clean, always-visible arena fallback for the Clip 1 recording.
+    // The free Epic mannequins remain assigned above; these simple silhouettes
+    // guarantee that both fighters are readable on every local machine.
+    BodyBlock->SetVisibility(true);
+    HeadBlock->SetVisibility(true);
+    LeftArmBlock->SetVisibility(true);
+    RightArmBlock->SetVisibility(true);
+    LeftLegBlock->SetVisibility(true);
+    RightLegBlock->SetVisibility(true);
     PlayLocomotion();
 }
 
@@ -151,4 +183,20 @@ void ARHFighter::Tick(float DeltaTime)
     {
         PlayLocomotion();
     }
+
+    ResetBlockingPose();
+    if (AttackRemaining > 0.0f)
+    {
+        const float Alpha = 1.0f - AttackRemaining / PunchDuration;
+        const float Reach = FMath::Sin(Alpha * PI) * 75.0f;
+        UStaticMeshComponent* PunchArm = (PunchCount % 2 == 0) ? RightArmBlock : LeftArmBlock;
+        const float Side = (PunchCount % 2 == 0) ? 40.0f : -40.0f;
+        PunchArm->SetRelativeLocation(FVector(8.0f + Reach, Side, 125.0f));
+    }
+}
+
+void ARHFighter::ResetBlockingPose()
+{
+    LeftArmBlock->SetRelativeLocation(FVector(8.0f, -40.0f, 125.0f));
+    RightArmBlock->SetRelativeLocation(FVector(8.0f, 40.0f, 125.0f));
 }
